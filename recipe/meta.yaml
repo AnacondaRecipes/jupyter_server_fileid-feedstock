@@ -1,5 +1,5 @@
 {% set name = "jupyter_server_fileid" %}
-{% set version = "0.9.0" %}
+{% set version = "0.9.3" %}
 
 package:
   name: {{ name|lower }}
@@ -7,33 +7,42 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 171538b7c7d08d11dbc57d4e6da196e0c258e4c2cd29249ef1e032bb423677f8
+  sha256: 521608bb87f606a8637fcbdce2f3d24a8b3cc89d2eef61751cb40e468d4e54be
 
 build:
   number: 0
-  skip: true # [py<37]
-  script: {{ PYTHON }} -m pip install .  --no-deps --no-build-isolation -vv
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   entry_points:
     - jupyter-fileid = jupyter_server_fileid.cli:main
+  skip: True # [py<37]
 
 requirements:
   host:
-    - hatchling >=1.8
-    - python
     - pip
-    - wheel
+    - python
+    - hatchling >=1.0
   run:
     - python
     - jupyter_server >=1.15,<3
     - jupyter_events >=0.5.0
 
 test:
+  source_files:
+    - tests
+    - conftest.py
+    - pyproject.toml
   imports:
     - jupyter_server_fileid
-  requires:
-    - pip
   commands:
     - pip check
+    - jupyter-fileid --help
+    - pytest -v
+  requires:
+    - pip
+    - pytest
+    - pytest-jupyter
+    - pytest-cov
+    - click
 
 about:
   home: https://github.com/jupyter-server/jupyter_server_fileid
